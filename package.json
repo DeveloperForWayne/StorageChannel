@@ -1,7 +1,8 @@
 {
   "scripts": {
+    "testrpc": "./node_modules/.bin/ganache-cli",
     "trace": "MODE=trace truffle test",
-    "coverage": "npm run clean && MODE=coverage truffle test; istanbul report html && opn coverage/index.html",
+    "coverage": "./node_modules/.bin/solidity-coverage",
     "profile": "npm run clean && MODE=profile truffle test; istanbul report html && opn coverage/index.html",
     "clean": "shx rm -rf coverage",
     "test": "truffle test",
@@ -12,14 +13,20 @@
   },
   "dependencies": {
     "@0x/sol-compiler": "^3.1.0",
-    "@0x/sol-coverage": "^2.0.4",
+    "@0x/sol-coverage": "^2.0.6",
     "@0x/sol-profiler": "^3.0.0",
     "@0x/sol-trace": "^2.0.5",
     "@0x/subproviders": "^2.1.11",
+    "ethers": "^4.0.27",
     "istanbul": "^0.4.5",
     "opn-cli": "^4.0.0",
     "shx": "^0.3.2",
+    "solc": "^0.5.7",
     "truffle": "^5.0.2",
     "web3-provider-engine": "^14.1.0"
+  },
+  "devDependencies": {
+    "openzeppelin-test-helpers": "^0.3.0",
+    "solidity-coverage": "^0.5.11"
   }
 }
