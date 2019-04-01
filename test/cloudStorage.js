@@ -116,7 +116,7 @@ contract("Cloud Storage", accounts => {
     const receiver = accounts[1];
     const channelId = ethers.utils.formatBytes32String("1");;
     
-    await cloudStorageInstance._openChannel(channelId, sender, receiver);
+    await cloudStorageInstance._openChannel(channelId, sender, receiver, ipfsHash1);
       
   });
 
@@ -126,7 +126,7 @@ contract("Cloud Storage", accounts => {
     const newOwner = accounts[2];
     const channelId = ethers.utils.formatBytes32String("1");;
     
-    await shouldFail.reverting(cloudStorageInstance._openChannel(channelId, sender, receiver, { from: newOwner }));
+    await shouldFail.reverting(cloudStorageInstance._openChannel(channelId, sender, receiver, ipfsHash1, { from: newOwner }));
 
   });
 
@@ -138,7 +138,28 @@ contract("Cloud Storage", accounts => {
     
     let sig = await getSign.getSignature(privateKey, messageHashBytes);
 
-    await shouldFail.reverting(cloudStorageInstance._closeChannel(fName, channelId, ipfsHash1, sig.v, sig.r, sig.s, { from: newOwner }));
+    await shouldFail.reverting(cloudStorageInstance._closeChannel(fName, channelId, ipfsHash1, ipfsHash1, sig.v, sig.r, sig.s, { from: newOwner }));
+
+  });
+
+  it("Should allow owner to close channel", async function () {
+    const sender = accounts[0];
+    const receiver = accounts[1];
+    const channelId = ethers.utils.formatBytes32String("1");
+    
+    let messageHashBytes = ethers.utils.arrayify(ipfsHash1);
+    
+    await cloudStorageInstance._openChannel(channelId, sender, receiver, ipfsHash1);
+
+    let sig = await getSign.getSignature(privateKey, messageHashBytes);
+    
+    await cloudStorageInstance._closeChannel(fName, channelId, ipfsHash1, ipfsHash1, sig.v, sig.r, sig.s);
+
+    assert.equal(
+      (await cloudStorageInstance.getFile(fName)),
+      ipfsHash1,
+      "Unable to close channel."
+    );  
 
   });
 

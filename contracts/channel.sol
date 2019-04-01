@@ -5,14 +5,15 @@ contract Channel {
     struct FileChannel {
         address sender;
         address receiver;
+        bytes ipfsHash;
     }
 
     mapping (bytes32 => FileChannel) public channels;
 
     bytes public ipfsHash;
 
-    function openChannel(bytes32 _channelId, address _sender, address _receiver) public {
-        channels[_channelId] = FileChannel(_sender, _receiver);
+    function openChannel(bytes32 _channelId, address _sender, address _receiver, bytes memory _ipfsHash) public {
+        channels[_channelId] = FileChannel(_sender, _receiver, _ipfsHash);
     }
 
     function verifySignature(uint8 v, bytes32 r, bytes32 s, bytes32 message) public pure returns (address) {
@@ -22,7 +23,7 @@ contract Channel {
     }
     
     function closeChannel(bytes32 _channelId, bytes32 message, uint8 v, bytes32 r, bytes32 s) public {
-        require(channels[_channelId].sender == verifySignature(v, r, s, message), "address not equal");
+        require(channels[_channelId].sender == verifySignature(v, r, s, message));
         delete channels[_channelId];
     }
 

@@ -47,18 +47,17 @@ contract cloudStorage {
         return File[_FileName];
     }
 
-    function _openChannel(bytes32 _channelId, address _sender, address _receiver)
+    function _openChannel(bytes32 _channelId, address _sender, address _receiver, bytes memory _ipfsHash)
         public
         onlyOwner
     {
-        _channel.openChannel(_channelId, _sender, _receiver);
+        _channel.openChannel(_channelId, _sender, _receiver, _ipfsHash);
     }
 
-    function _closeChannel(bytes memory _fileName, bytes32 _channelId, bytes memory _ipfshash, uint8 v, bytes32 r, bytes32 s)
+    function _closeChannel(bytes memory _fileName, bytes32 _channelId, bytes memory _ipfshash, bytes32 msgHash, uint8 v, bytes32 r, bytes32 s)
         public
         onlyOwner
     {
-        bytes32 msgHash = keccak256(abi.encodePacked(_ipfshash));
         _channel.closeChannel(_channelId, msgHash, v, r, s);
         addOrUpdateFile(_fileName, _ipfshash);
     }

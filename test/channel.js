@@ -43,18 +43,36 @@ contract("State Channel", accounts => {
     const receiver = accounts[1];
     const channelID = ethers.utils.formatBytes32String("1");
 
-    await channelInstance.openChannel(channelID, sender, receiver);
-
     let ipfsBytes = ethers.utils.id(ipfsHash);
     let messageHashBytes = ethers.utils.arrayify(ipfsBytes);
+
+    await channelInstance.openChannel(channelID, sender, receiver, ipfsBytes);
     
     let sig = await getSign.getSignature(privateKey, messageHashBytes);
 
     await channelInstance.closeChannel(channelID, ipfsBytes, sig.v, sig.r, sig.s)
-    // assert.equal(
-    // channelInstance.channels[channelID],
-    // null,
-    // "Unable to close channel."
-    // );  
+    
+    assert.equal(
+    channelInstance.channels[channelID],
+    null,
+    "Unable to close channel."
+    );  
+  });
+
+  it("Should not allow sender to close channel if verify signature fail", async function () {
+    const sender = accounts[0];
+    const receiver = accounts[1];
+    const channelID = ethers.utils.formatBytes32String("1");
+
+    let ipfsBytes = ethers.utils.id(ipfsHash);
+    let ipfsBytesOther = ethers.utils.id("QmT9qk3CRYbFDWpDFYeAv8T8H1gnongwKhh5J68NLkLir6");
+    let messageHashBytes = ethers.utils.arrayify(ipfsBytes);
+
+    await channelInstance.openChannel(channelID, sender, receiver, ipfsBytes);
+    
+    let sig = await getSign.getSignature(privateKey, messageHashBytes);
+
+    await shouldFail.reverting(channelInstance.closeChannel(channelID, ipfsBytesOther, sig.v, sig.r, sig.s));
+    
   });
 });
